@@ -1,6 +1,17 @@
-# VidFlow
+<p align="center">
+  <img src="assets/banner.svg" alt="VidFlow" width="800"/>
+</p>
 
-**Chrome extension that automates video creation with [Google Flow](https://labs.google/fx/es/tools/video-fx/) (Veo) and Gemini TTS.**
+<p align="center">
+  <strong>Chrome extension that automates video creation with <a href="https://labs.google/fx/es/tools/video-fx/">Google Flow</a> (Veo) and Gemini TTS.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Chrome-MV3-4285F4?logo=googlechrome&logoColor=white" alt="Chrome MV3"/>
+  <img src="https://img.shields.io/badge/Google_Flow-Veo_3-EA4335?logo=google&logoColor=white" alt="Google Flow"/>
+  <img src="https://img.shields.io/badge/Gemini-TTS-8E75B2?logo=googlegemini&logoColor=white" alt="Gemini TTS"/>
+  <img src="https://img.shields.io/github/license/Nachx639/VidFlow" alt="License"/>
+</p>
 
 Generate images, animate them into videos, add AI narration — all from a single sidepanel. Built for creators who need to produce video content at scale.
 
