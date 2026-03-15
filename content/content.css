@@ -1,0 +1,141 @@
+/**
+ * VidFlow - Content Script Styles
+ * Overlay indicators for automation status
+ */
+
+/* Automation status indicator */
+.vidflow-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 999999;
+  background: linear-gradient(135deg, #1a1b2e 0%, #2d2f47 100%);
+  border: 2px solid #f97316;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: vidflow-fadeIn 0.3s ease;
+}
+
+.vidflow-indicator.hidden {
+  display: none;
+}
+
+.vidflow-indicator-icon {
+  width: 24px;
+  height: 24px;
+  background: #f97316;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vidflow-indicator-icon svg {
+  width: 14px;
+  height: 14px;
+  fill: white;
+}
+
+.vidflow-indicator-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vidflow-indicator-title {
+  font-weight: 600;
+  color: #f97316;
+}
+
+.vidflow-indicator-status {
+  font-size: 12px;
+  color: #a1a5b7;
+}
+
+/* Pulse animation for active state */
+.vidflow-indicator.active .vidflow-indicator-icon {
+  animation: vidflow-pulse 1.5s infinite;
+}
+
+@keyframes vidflow-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+  }
+}
+
+@keyframes vidflow-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress bar overlay */
+.vidflow-progress {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
+  background: #1a1b2e;
+  border: 1px solid #3d3f5a;
+  border-radius: 8px;
+  padding: 16px 24px;
+  min-width: 300px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.vidflow-progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #a1a5b7;
+}
+
+.vidflow-progress-bar {
+  height: 6px;
+  background: #2d2f47;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vidflow-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f97316, #fb923c);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Highlight for currently targeted elements */
+.vidflow-highlight {
+  outline: 3px solid #f97316 !important;
+  outline-offset: 2px;
+  animation: vidflow-highlight-pulse 1s infinite;
+}
+
+@keyframes vidflow-highlight-pulse {
+  0%, 100% {
+    outline-color: #f97316;
+  }
+  50% {
+    outline-color: #fb923c;
+  }
+}

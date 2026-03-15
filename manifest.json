@@ -1,0 +1,107 @@
+{
+  "manifest_version": 3,
+  "name": "VidFlow - Smart Video Automation",
+  "version": "0.4.1",
+  "description": "Pipeline: Flow (videos) + Speech (narración)",
+  "author": "Canal Educativo",
+
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "activeTab",
+    "scripting",
+    "downloads",
+    "sidePanel"
+  ],
+
+  "host_permissions": [
+    "*://labs.google/*",
+    "*://labs.google.com/*",
+    "*://aistudio.google.com/*"
+  ],
+
+  "action": {
+    "default_title": "VidFlow - Clic para abrir panel"
+  },
+
+  "side_panel": {
+    "default_path": "sidepanel/panel.html"
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "*://labs.google/*",
+        "*://aistudio.google.com/*"
+      ],
+      "js": [
+        "content/bridge.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://labs.google/fx/tools/video-fx/*",
+        "*://labs.google/fx/tools/video-fx",
+        "*://labs.google/fx/*/tools/video-fx/*",
+        "*://labs.google/fx/*/tools/video-fx",
+        "*://labs.google/fx/tools/flow/*",
+        "*://labs.google/fx/tools/flow",
+        "*://labs.google/fx/*/tools/flow/*",
+        "*://labs.google/fx/*/tools/flow"
+      ],
+      "js": [
+        "content/flow/slate-bridge.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://labs.google/fx/tools/video-fx/*",
+        "*://labs.google/fx/tools/video-fx",
+        "*://labs.google/fx/*/tools/video-fx/*",
+        "*://labs.google/fx/*/tools/video-fx",
+        "*://labs.google/fx/tools/flow/*",
+        "*://labs.google/fx/tools/flow",
+        "*://labs.google/fx/*/tools/flow/*",
+        "*://labs.google/fx/*/tools/flow"
+      ],
+      "js": [
+        "content/bridge.js",
+        "content/flow/utils.js",
+        "content/flow/log.js",
+        "content/flow/selectors.js",
+        "content/flow/settings.js",
+        "content/flow/generation-type.js",
+        "content/flow/generation-image.js",
+        "content/flow/generation.js",
+        "content/flow/video.js",
+        "content/flow/pipeline.js",
+        "content/flow/detect.js",
+        "content/flow/monitor.js",
+        "content/flow/main.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "*://aistudio.google.com/generate-speech",
+        "*://aistudio.google.com/generate-speech/*"
+      ],
+      "js": [
+        "content/bridge.js",
+        "content/speech/utils.js",
+        "content/speech/log.js",
+        "content/speech/selectors.js",
+        "content/speech/generation.js",
+        "content/speech/main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

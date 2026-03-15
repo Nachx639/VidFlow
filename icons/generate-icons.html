@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>VidFlow Icon Generator</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      background: #1a1b2e;
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+    .icons {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      margin: 30px 0;
+    }
+    .icon-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    canvas {
+      border: 1px solid #3d3f5a;
+      border-radius: 8px;
+    }
+    button {
+      background: #f97316;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ea580c;
+    }
+    .instructions {
+      background: #2d2f47;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>VidFlow Icon Generator</h1>
+  <p>Haz clic en cada botón para descargar el icono correspondiente</p>
+
+  <div class="icons">
+    <div class="icon-box">
+      <canvas id="icon16" width="16" height="16"></canvas>
+      <span>16x16</span>
+      <button onclick="download(16)">Descargar</button>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon48" width="48" height="48"></canvas>
+      <span>48x48</span>
+      <button onclick="download(48)">Descargar</button>
+    </div>
+    <div class="icon-box">
+      <canvas id="icon128" width="128" height="128"></canvas>
+      <span>128x128</span>
+      <button onclick="download(128)">Descargar</button>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h3>Instrucciones:</h3>
+    <ol>
+      <li>Abre este archivo en Chrome</li>
+      <li>Descarga cada icono haciendo clic en los botones</li>
+      <li>Guarda los archivos en la carpeta <code>icons/</code> con nombres:
+        <ul>
+          <li>icon16.png</li>
+          <li>icon48.png</li>
+          <li>icon128.png</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <script>
+    function drawIcon(size) {
+      const canvas = document.getElementById('icon' + size);
+      const ctx = canvas.getContext('2d');
+
+      // Background gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#f97316');
+      gradient.addColorStop(1, '#ea580c');
+
+      // Rounded rectangle background
+      const radius = size * 0.2;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, radius);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Draw "V" letter
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${size * 0.6}px -apple-system, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('V', size / 2, size / 2 + size * 0.05);
+
+      // Draw play triangle (small)
+      const triSize = size * 0.15;
+      const triX = size * 0.7;
+      const triY = size * 0.7;
+      ctx.beginPath();
+      ctx.moveTo(triX, triY - triSize / 2);
+      ctx.lineTo(triX + triSize, triY);
+      ctx.lineTo(triX, triY + triSize / 2);
+      ctx.closePath();
+      ctx.fillStyle = 'white';
+      ctx.fill();
+    }
+
+    function download(size) {
+      const canvas = document.getElementById('icon' + size);
+      const link = document.createElement('a');
+      link.download = `icon${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Draw all icons on load
+    [16, 48, 128].forEach(drawIcon);
+  </script>
+</body>
+</html>

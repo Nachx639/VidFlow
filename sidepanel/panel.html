@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VidFlow</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <div class="vf-container">
+    <!-- Header -->
+    <div class="vf-header">
+      <div class="vf-logo">
+        <span class="vf-logo-icon">V</span>
+        <span class="vf-logo-text">VidFlow</span>
+      </div>
+      <span class="vf-version">v0.3</span>
+    </div>
+
+    <!-- Pipeline Steps Indicator -->
+    <div class="vf-pipeline-indicator" id="vf-pipeline-indicator">
+      <div class="vf-pipeline-step" data-step="flow">
+        <div class="vf-pipeline-step-icon">🎬</div>
+        <div class="vf-pipeline-step-label">Flow</div>
+        <div class="vf-pipeline-step-status">Videos</div>
+      </div>
+      <div class="vf-pipeline-connector"></div>
+      <div class="vf-pipeline-step" data-step="speech">
+        <div class="vf-pipeline-step-icon">🎙️</div>
+        <div class="vf-pipeline-step-label">Speech</div>
+        <div class="vf-pipeline-step-status">Narración</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="vf-tabs">
+      <button class="vf-tab active" data-tab="scenes">Escenas</button>
+      <button class="vf-tab" data-tab="refs">Referencias</button>
+      <button class="vf-tab" data-tab="config">Config</button>
+    </div>
+
+    <!-- Tab: Escenas -->
+    <div class="vf-tab-content active" id="tab-scenes">
+      <div class="vf-section">
+        <!-- Resumen de escenas cargadas -->
+        <div class="vf-scenes-summary" id="vf-scenes-summary" style="display: none;">
+          <div class="vf-summary-header">
+            <span class="vf-summary-title">✓ Escenas cargadas</span>
+            <button class="vf-summary-clear" id="vf-clear-scenes" title="Limpiar escenas">Limpiar</button>
+          </div>
+          <div class="vf-summary-stats">
+            <span class="vf-summary-stat">🎬 <strong id="vf-prompts-count">0</strong> prompts</span>
+            <span class="vf-summary-stat">🎙️ <strong id="vf-narrations-count">0</strong> narraciones</span>
+            <span class="vf-summary-stat" id="vf-styles-stat">🎭 <strong id="vf-styles-count">0</strong> estilos</span>
+            <span class="vf-summary-stat" id="vf-refs-stat" style="display:none;">🖼️ <strong id="vf-refs-count">0</strong> refs</span>
+          </div>
+          <div class="vf-summary-range" id="vf-scene-range"></div>
+          <div class="vf-summary-mismatch" id="vf-refs-mismatch" style="display:none;"></div>
+        </div>
+
+        <div class="vf-import-section">
+          <p class="vf-format-hint">Formato: <code>N.</code> al inicio de cada bloque. Separar bloques con línea vacía.</p>
+
+          <!-- Prompts -->
+          <div class="vf-import-field">
+            <div class="vf-label-row">
+              <label class="vf-label-small">🎬 Prompts <span class="vf-hint-inline">(numerados)</span></label>
+              <button type="button" id="vf-clear-prompts" class="vf-btn-clear" title="Limpiar prompts">✕</button>
+            </div>
+            <textarea id="vf-import-prompts" class="vf-textarea vf-textarea-prompts" rows="6" placeholder="1. Objects: A magical treehouse in a giant oak tree.
+Action: Soft golden light emanates from windows.
+Style: 3D Pixar animation style.
+Camera: Wide establishing shot.
+
+2. Objects: A friendly owl with big round glasses.
+Action: The owl turns its head slowly.
+Style: 3D Pixar animation style.
+Camera: Medium shot.
+
+3. Objects: Inside the treehouse, a cozy reading nook.
+Action: Books gently float and pages turn.
+Style: 3D Pixar animation style.
+Camera: Interior wide shot."></textarea>
+          </div>
+
+          <!-- Narraciones -->
+          <div class="vf-import-field">
+            <div class="vf-label-row">
+              <label class="vf-label-small">🎙️ Narraciones <span class="vf-hint-inline">(numeradas, omitir las que no necesitan audio)</span></label>
+              <button type="button" id="vf-clear-narrations" class="vf-btn-clear" title="Limpiar narraciones">✕</button>
+            </div>
+            <textarea id="vf-import-narrations" class="vf-textarea vf-textarea-narrations" rows="4" placeholder="1. En lo más profundo del bosque encantado,
+existe una casa muy especial.
+
+3. Dentro de la casa, los libros cobran vida.
+Flotan por el aire buscando lectores."></textarea>
+          </div>
+
+          <!-- Style Instructions -->
+          <div class="vf-import-field">
+            <label class="vf-checkbox-label vf-style-toggle">
+              <input type="checkbox" id="vf-same-style" checked>
+              <span>Usar mismo estilo para todas</span>
+            </label>
+
+            <!-- Estilo único -->
+            <div id="vf-single-style-container">
+              <div class="vf-input-row">
+                <input type="text" id="vf-speech-style" class="vf-input" value="Read aloud in a warm and friendly tone:" placeholder="Read aloud in a warm and friendly tone:">
+                <button type="button" id="vf-clear-style" class="vf-btn-clear" title="Limpiar estilo">✕</button>
+              </div>
+            </div>
+
+            <!-- Estilos por escena -->
+            <div id="vf-batch-style-container" style="display: none;">
+              <label class="vf-label-small">🎭 Estilos <span class="vf-hint-inline">(numerados, omitir usa el default)</span></label>
+              <textarea id="vf-import-styles" class="vf-textarea vf-textarea-styles" rows="3" placeholder="1. Read aloud in a warm and friendly tone:
+
+5. Read with excitement and energy:
+
+10. Read in a mysterious whisper:"></textarea>
+              <div class="vf-default-style">
+                <label class="vf-label-small">Estilo default:</label>
+                <input type="text" id="vf-default-style" class="vf-input" value="Read aloud in a warm and friendly tone:" placeholder="Estilo para escenas sin especificar">
+              </div>
+            </div>
+          </div>
+
+          <button class="vf-btn vf-btn-secondary" id="vf-import-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Importar Escenas
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Referencias -->
+    <div class="vf-tab-content" id="tab-refs">
+      <!-- Prompts para generar imágenes -->
+      <div class="vf-section">
+        <label class="vf-label">Prompts de imagen</label>
+        <p class="vf-hint">Escribe prompts numerados para generar imágenes en <a href="https://labs.google/fx/es/tools/flow" target="_blank">Flow</a>. Cada imagen se asigna a la escena del mismo número.</p>
+
+        <div class="vf-import-field">
+          <div class="vf-label-row">
+            <label class="vf-label-small">🖼️ Prompts <span class="vf-hint-inline">(numerados)</span></label>
+            <button type="button" id="vf-copy-image-prompts" class="vf-btn-clear" title="Copiar prompts">📋</button>
+            <button type="button" id="vf-clear-image-prompts" class="vf-btn-clear" title="Limpiar">✕</button>
+          </div>
+          <textarea id="vf-image-prompts" class="vf-textarea vf-textarea-prompts" rows="5" placeholder="1. A magical treehouse in a giant oak tree, 3D Pixar style, golden hour lighting.
+
+2. A friendly owl with big round glasses perched on a branch, 3D Pixar style.
+
+3. Inside a cozy treehouse reading nook with floating books, 3D Pixar style."></textarea>
+        </div>
+        <div class="vf-refs-match" id="vf-refs-match" style="display:none;"></div>
+      </div>
+
+      <!-- Imágenes de referencia (subir numeradas) -->
+      <div class="vf-section" id="vf-batch-section">
+        <div id="vf-batch-content">
+          <label class="vf-label">Imágenes de referencia</label>
+          <p class="vf-hint">Sube imágenes numeradas (001, 002, 003...). Se asignan a cada escena por número.</p>
+
+          <div class="vf-batch-area" id="vf-batch-area">
+            <div class="vf-batch-dropzone" id="vf-batch-dropzone">
+              <span class="vf-batch-icon">📁</span>
+              <span class="vf-batch-text">Clic o arrastra imágenes aquí</span>
+              <span class="vf-batch-hint">Se ordenarán por nombre (001, 002...)</span>
+            </div>
+            <input type="file" accept="image/*" id="vf-batch-input" multiple hidden>
+          </div>
+
+          <div class="vf-batch-list" id="vf-batch-list" style="display:none;">
+            <div class="vf-batch-header">
+              <span id="vf-batch-count">0 imágenes</span>
+              <button class="vf-batch-clear" id="vf-batch-clear">Limpiar</button>
+            </div>
+            <div class="vf-batch-items" id="vf-batch-items"></div>
+          </div>
+
+          <div class="vf-refs-match" id="vf-batch-match" style="display:none;"></div>
+
+          <div class="vf-batch-alert" id="vf-batch-alert" style="display: none;">
+            <span class="vf-batch-alert-icon">🖼️</span>
+            <span class="vf-batch-alert-text">Imágenes cargadas - se usarán como referencia para Flow</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Config -->
+    <div class="vf-tab-content" id="tab-config">
+      <!-- Selector de Pasos del Pipeline -->
+      <div class="vf-section">
+        <label class="vf-label vf-label-title">Pasos del Pipeline</label>
+        <p class="vf-hint">Selecciona qué pasos ejecutar. Puedes ejecutar todo el pipeline o pasos individuales.</p>
+
+        <div class="vf-pipeline-selector">
+          <label class="vf-checkbox-label vf-pipeline-option">
+            <input type="checkbox" id="vf-step-flow" checked>
+            <span class="vf-pipeline-checkbox-icon">🎬</span>
+            <span>Flow (Videos)</span>
+          </label>
+          <label class="vf-checkbox-label vf-pipeline-option">
+            <input type="checkbox" id="vf-step-speech" checked>
+            <span class="vf-pipeline-checkbox-icon">🎙️</span>
+            <span>Speech (Narración)</span>
+          </label>
+        </div>
+
+        <div class="vf-parallel-mode-section">
+          <label class="vf-checkbox-label vf-parallel-option">
+            <input type="checkbox" id="vf-parallel-mode">
+            <span class="vf-parallel-icon">⚡</span>
+            <span>Modo Paralelo (Flow || Speech)</span>
+          </label>
+          <p class="vf-hint vf-parallel-hint">Flow y Speech se ejecutan simultáneamente.</p>
+        </div>
+
+        <div class="vf-parallel-indicator" id="vf-parallel-indicator" style="display:none;">
+          <span class="vf-parallel-badge">⚡ MODO PARALELO ACTIVO</span>
+        </div>
+      </div>
+
+      <!-- Generación de Videos -->
+      <div class="vf-section">
+        <label class="vf-label vf-label-title">Generación de Videos (Flow)</label>
+
+        <label class="vf-label">Tipo de generación</label>
+        <select id="vf-generation-type" class="vf-select">
+          <option value="text-to-video">Texto a video</option>
+          <option value="image-to-video" selected>Imagen a video</option>
+          <option value="ingredients-to-video">Ingredientes a video</option>
+        </select>
+
+        <label class="vf-label">Modelo de Veo</label>
+        <select id="vf-veo-model" class="vf-select">
+          <optgroup label="Veo 3.1 (con Audio)">
+            <option value="veo-3.1-fast">Veo 3.1 - Fast</option>
+            <option value="veo-3.1-fast-low">Veo 3.1 - Fast [Lower Priority]</option>
+            <option value="veo-3.1-quality">Veo 3.1 - Quality</option>
+          </optgroup>
+          <optgroup label="Veo 2 (sin Audio)">
+            <option value="veo-2-fast">Veo 2 - Fast</option>
+            <option value="veo-2-quality">Veo 2 - Quality</option>
+          </optgroup>
+        </select>
+
+        <label class="vf-label">Orientación del video</label>
+        <select id="vf-aspect-ratio" class="vf-select">
+          <option value="16:9">Horizontal (16:9) - YouTube</option>
+          <option value="9:16">Vertical (9:16) - TikTok, Reels</option>
+        </select>
+
+        <label class="vf-label">Resultados por petición</label>
+        <select id="vf-results-per-request" class="vf-select">
+          <option value="1">1 video</option>
+          <option value="2">2 videos</option>
+          <option value="3">3 videos</option>
+          <option value="4">4 videos</option>
+        </select>
+      </div>
+
+      <!-- Configuración de Narración (Speech) -->
+      <div class="vf-section">
+        <label class="vf-label vf-label-title">Narración (Speech)</label>
+
+        <label class="vf-label">API Key de Gemini</label>
+        <input type="password" id="vf-gemini-api-key" class="vf-input" placeholder="AIzaSy...">
+        <small class="vf-hint">Obtén tu API key en <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a></small>
+
+        <label class="vf-label">Modelo TTS</label>
+        <select id="vf-speech-model" class="vf-select">
+          <option value="gemini-2.5-pro-preview-tts" selected>Gemini 2.5 Pro - Mejor calidad</option>
+          <option value="gemini-2.5-flash-preview-tts">Gemini 2.5 Flash - Más rápido</option>
+        </select>
+
+        <label class="vf-label">Voz de narración</label>
+        <select id="vf-speech-voice" class="vf-select">
+          <optgroup label="👩 Voces Femeninas">
+            <option value="Zephyr">Zephyr - Energética, brillante</option>
+            <option value="Kore">Kore - Firme</option>
+            <option value="Leda">Leda - Juvenil</option>
+            <option value="Aoede">Aoede - Ligera, fresca</option>
+            <option value="Callirrhoe">Callirrhoe - Relajada</option>
+            <option value="Autonoe">Autonoe - Brillante</option>
+            <option value="Despina">Despina - Suave</option>
+            <option value="Erinome">Erinome - Clara</option>
+            <option value="Laomedeia">Laomedeia - Animada</option>
+            <option value="Achernar">Achernar - Suave</option>
+            <option value="Gacrux">Gacrux - Madura</option>
+            <option value="Pulcherrima">Pulcherrima - Directa</option>
+            <option value="Vindemiatrix">Vindemiatrix - Gentil</option>
+            <option value="Sulafat" selected>Sulafat - Cálida</option>
+          </optgroup>
+          <optgroup label="👨 Voces Masculinas">
+            <option value="Puck">Puck - Animado, alegre</option>
+            <option value="Charon">Charon - Confiable, autoridad</option>
+            <option value="Fenrir">Fenrir - Excitable</option>
+            <option value="Orus">Orus - Firme</option>
+            <option value="Enceladus">Enceladus - Susurrante</option>
+            <option value="Iapetus">Iapetus - Claro</option>
+            <option value="Umbriel">Umbriel - Relajado</option>
+            <option value="Algieba">Algieba - Suave</option>
+            <option value="Algenib">Algenib - Áspero</option>
+            <option value="Rasalgethi">Rasalgethi - Informativo</option>
+            <option value="Alnilam">Alnilam - Firme</option>
+            <option value="Schedar">Schedar - Parejo</option>
+            <option value="Achird">Achird - Amigable</option>
+            <option value="Zubenelgenubi">Zubenelgenubi - Casual</option>
+            <option value="Sadachbia">Sadachbia - Vivaz</option>
+            <option value="Sadaltager">Sadaltager - Conocedor</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Configuración General -->
+      <div class="vf-section">
+        <label class="vf-label vf-label-title">Configuración General</label>
+
+        <label class="vf-label">Delay entre generaciones (seg)</label>
+        <input type="number" id="vf-delay" class="vf-input" value="60" min="5" max="120">
+
+        <label class="vf-checkbox-label">
+          <input type="checkbox" id="vf-auto-download" checked>
+          <span>Auto-descargar resultados</span>
+        </label>
+      </div>
+
+      <!-- Acciones Rápidas -->
+      <div class="vf-section">
+        <label class="vf-label vf-label-title">Abrir Herramientas</label>
+        <div class="vf-quick-actions">
+          <button class="vf-btn vf-btn-secondary vf-btn-small" id="vf-open-flow">
+            🎬 Flow
+          </button>
+          <button class="vf-btn vf-btn-secondary vf-btn-small" id="vf-open-speech">
+            🎙️ Speech
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress & Actions -->
+    <div class="vf-footer">
+      <!-- Carpeta de descarga -->
+      <div class="vf-folder-section">
+        <label class="vf-label">Carpeta del proyecto</label>
+        <div class="vf-folder-input">
+          <span class="vf-folder-prefix">VidFlow/</span>
+          <input type="text" id="vf-folder-name" class="vf-input vf-folder-field" placeholder="Proyecto_20260123_1430">
+        </div>
+        <label class="vf-checkbox-label vf-new-folder-option">
+          <input type="checkbox" id="vf-auto-new-folder" checked>
+          <span>Crear carpeta nueva automáticamente</span>
+        </label>
+      </div>
+
+      <!-- Pipeline Progress -->
+      <div class="vf-pipeline-progress" id="vf-pipeline-progress" style="display:none;">
+        <div class="vf-pipeline-current-step">
+          <span id="vf-current-step-icon">🎬</span>
+          <span id="vf-current-step-name">Flow</span>
+        </div>
+        <div class="vf-progress-text">
+          <span id="vf-progress-status">Preparando...</span>
+          <span id="vf-progress-count">0/0</span>
+        </div>
+        <div class="vf-progress-bar">
+          <div class="vf-progress-fill" id="vf-progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Batch Queue -->
+      <div class="vf-queue-section" id="vf-queue-section" style="display: none;">
+        <div class="vf-queue-header">
+          <span class="vf-queue-title">Cola de proyectos</span>
+          <span class="vf-queue-count" id="vf-queue-count">0</span>
+          <button class="vf-btn-clear" id="vf-queue-clear" title="Limpiar cola">✕</button>
+        </div>
+        <div class="vf-queue-list" id="vf-queue-list"></div>
+      </div>
+
+      <div class="vf-action-buttons">
+        <button class="vf-btn vf-btn-secondary" id="vf-add-queue-btn" disabled>
+          + Cola
+        </button>
+        <button class="vf-btn vf-btn-primary" id="vf-start-btn" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <span id="vf-start-text">Añade escenas primero</span>
+        </button>
+      </div>
+
+      <button class="vf-btn vf-btn-danger" id="vf-stop-btn" style="display:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="6" y="6" width="12" height="12"/>
+        </svg>
+        Detener
+      </button>
+    </div>
+  </div>
+
+  <script src="panel-utils.js"></script>
+  <script src="panel-state.js"></script>
+  <script src="panel-scenes.js"></script>
+  <script src="panel-pipeline.js"></script>
+  <script src="panel.js"></script>
+</body>
+</html>

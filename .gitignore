@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test coverage
+coverage/
+
+# Build artifacts
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment files & secrets
+.env
+.env.*
+!.env.example
+
+# Claude context files (may contain session metadata)
+**/CLAUDE.md
+
+# Internal reports
+QA_REPORT.md
+UI_AUDIT.md
+CHANGELOG.md
+INSTRUCCIONES.md
+
+# Unused drafts
+background/downloads.js
+background/state.js
+background/utils.js
+background/README.md
+background/pipeline/
+background/workflows/
